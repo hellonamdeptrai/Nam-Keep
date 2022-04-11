@@ -18,26 +18,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_margin="5dp"
+    android:background="@drawable/background_radius"
+    android:orientation="vertical"
+    android:id="@+id/layout_item">
 
-    <com.example.namkeep.ui.home.SquareFrameLayout
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imageview_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/imageview_item"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@null"
-            android:scaleType="centerCrop" />
-
-    </com.example.namkeep.ui.home.SquareFrameLayout>
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:riv_corner_radius="12dp"
+        android:adjustViewBounds="true" />
 
     <TextView
         android:id="@+id/textview_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
         android:maxLines="1"
         android:padding="16dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"

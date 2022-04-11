@@ -26,7 +26,7 @@ public class Item {
     private static final String THUMB_BASE_URL = "https://storage.googleapis.com/androiddevelopers/sample_data/activity_transition/thumbs/";
 
     public static Item[] ITEMS = new Item[] {
-            new Item("Flying in the Light", "Romain Guy", "flying_in_the_light.jpg"),
+            new Item("Flying in the Light", "Romain Guy", ""),
             new Item("Caterpillar", "Romain Guy", "caterpillar.jpg"),
             new Item("Look Me in the Eye", "Romain Guy", "look_me_in_the_eye.jpg"),
             new Item("Flamingo", "Romain Guy", "flamingo.jpg"),
