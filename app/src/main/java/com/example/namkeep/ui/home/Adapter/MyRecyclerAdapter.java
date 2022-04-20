@@ -1,5 +1,6 @@
 package com.example.namkeep.ui.home.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.namkeep.R;
+import com.example.namkeep.object.Note;
 import com.example.namkeep.ui.home.Helper.IClickItemDetail;
 import com.example.namkeep.ui.home.Helper.ItemTouchHelperAdapter;
 import com.example.namkeep.ui.home.Helper.OnStartDangListener;
@@ -19,6 +21,7 @@ import com.example.namkeep.ui.home.Item;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,16 +32,25 @@ import butterknife.Unbinder;
 public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.MyViewHolder> implements ItemTouchHelperAdapter {
 
     Context context;
-    List<String> stringList;
+    private Activity activity;
     OnStartDangListener listener;
+    private ArrayList<Note> notesList;
+//    row_id, title, content, color, background, categoryId
 
     private IClickItemDetail iClickItemDetail;
 
-    public MyRecyclerAdapter(Context context, OnStartDangListener listener, IClickItemDetail iClickItemDetail) {
+    public MyRecyclerAdapter(Context context, OnStartDangListener listener, IClickItemDetail iClickItemDetail
+    ,ArrayList<Note> notesList) {
         this.context = context;
         this.listener = listener;
-
         this.iClickItemDetail = iClickItemDetail;
+        this.notesList = notesList;
+//        this.row_id = row_id;
+//        this.title = title;
+//        this.content = content;
+//        this.color = color;
+//        this.background = background;
+//        this.categoryId = categoryId;
     }
 
     @NonNull
@@ -49,11 +61,12 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        final Item item = Item.ITEMS[position];
+        final Note noteItem = notesList.get(position);
 
-        Picasso.with(holder.image.getContext()).load(item.getThumbnailUrl()).into(holder.image);
+//        Picasso.with(holder.image.getContext()).load(item.getThumbnailUrl()).into(holder.image);
+        holder.image.setImageBitmap(noteItem.getBackground());
 
-        holder.name.setText(item.getName());
+        holder.name.setText(noteItem.getTitle());
         holder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -64,14 +77,17 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         holder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iClickItemDetail.onClickItemTour(view ,item);
+                iClickItemDetail.onClickItemTour(view ,noteItem);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return Item.ITEMS.length;
+        if (notesList != null) {
+            return notesList.size();
+        }
+        return 0;
     }
 
     @Override

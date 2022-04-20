@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_box_note"
+        android:icon="@drawable/ic_baseline_add_24"
+        android:title="Add box"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/add_theme_note"
+        android:icon="@drawable/ic_baseline_palette_24"
+        android:title="Add theme"
+        app:showAsAction="always"
+        />
+    <item
+        android:title=""
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/undo_note"
+        android:icon="@drawable/ic_baseline_palette_24"
+        android:title="Add theme"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/redo_note"
+        android:icon="@drawable/ic_baseline_palette_24"
+        android:title="Add theme"
+        app:showAsAction="always"
+        />
+    <item
+        android:title=""
+        app:showAsAction="always"
+        />
+    <item
+        android:title=""
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/three_dots_note"
+        android:icon="@drawable/ic_baseline_palette_24"
+        android:title="Add theme"
+        app:showAsAction="always"
+        />
+    v
+</menu>

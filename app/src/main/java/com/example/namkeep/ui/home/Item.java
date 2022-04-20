@@ -16,6 +16,10 @@
 
 package com.example.namkeep.ui.home;
 
+import android.database.Cursor;
+
+import com.example.namkeep.DatabaseHelper;
+
 /**
  * Represents an Item in our application. Each item has a name, id, full size image url and
  * thumbnail url.
@@ -24,6 +28,8 @@ public class Item {
 
     private static final String LARGE_BASE_URL = "https://storage.googleapis.com/androiddevelopers/sample_data/activity_transition/large/";
     private static final String THUMB_BASE_URL = "https://storage.googleapis.com/androiddevelopers/sample_data/activity_transition/thumbs/";
+
+    DatabaseHelper myDB;
 
     public static Item[] ITEMS = new Item[] {
             new Item("Flying in the Light", "Romain Guy", ""),

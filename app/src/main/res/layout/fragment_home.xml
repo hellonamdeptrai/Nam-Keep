@@ -15,5 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:paddingLeft="5dp"
-        android:paddingRight="5dp" />
+        android:paddingRight="5dp"
+        android:clipToPadding="false"
+        android:paddingBottom="50dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
