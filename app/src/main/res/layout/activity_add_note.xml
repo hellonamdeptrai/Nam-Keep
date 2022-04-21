@@ -79,14 +79,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/main_checkbox_note" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/main_colors_note"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/color_background_imaged"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:riv_mutate_background="true"
                 android:layout_marginTop="15dp"
                 android:layout_marginLeft="15dp"
+                app:riv_corner_radius="50dp"
+                app:riv_border_color="@android:color/black"
+                app:riv_border_width="1dp"
+                android:adjustViewBounds="true"
+                tools:ignore="MissingConstraints"
                 app:layout_constraintStart_toEndOf="@+id/main_categories_note"
-                app:layout_constraintTop_toBottomOf="@+id/main_checkbox_note" />
+                app:layout_constraintTop_toBottomOf="@+id/main_checkbox_note"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

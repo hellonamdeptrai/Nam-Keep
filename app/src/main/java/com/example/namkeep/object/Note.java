@@ -6,13 +6,13 @@ public class Note {
     private int id;
     private String title;
     private String content;
-    private String color;
+    private int color;
     private Bitmap background;
     private int categoryId;
 
     public Note() {}
 
-    public Note(int id, String title, String content, String color, Bitmap background, int categoryId) {
+    public Note(int id, String title, String content, int color, Bitmap background, int categoryId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -45,11 +45,11 @@ public class Note {
         this.content = content;
     }
 
-    public String getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(int color) {
         this.color = color;
     }
 

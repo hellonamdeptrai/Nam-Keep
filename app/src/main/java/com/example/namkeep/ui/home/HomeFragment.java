@@ -70,30 +70,17 @@ public class HomeFragment extends Fragment {
         }, new IClickItemDetail() {
             @Override
             public void onClickItemTour(View view, Note note) {
-                // Construct an Intent as normal
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra(DetailActivity.EXTRA_PARAM_ID, note.getId());
-
-                // BEGIN_INCLUDE(start_activity)
-                /*
-                 * Now create an {@link android.app.ActivityOptions} instance using the
-                 * {@link ActivityOptionsCompat#makeSceneTransitionAnimation(Activity, Pair[])} factory
-                 * method.
-                 */
-                @SuppressWarnings("unchecked")
-                ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        getActivity(),
-
-                        // Now we provide a list of Pair items which contain the view we can transitioning
-                        // from, and the name of the view it is transitioning to, in the launched activity
-                        new Pair<>(view.findViewById(R.id.imageview_item),
-                                DetailActivity.VIEW_NAME_HEADER_IMAGE),
-                        new Pair<>(view.findViewById(R.id.textview_name),
-                                DetailActivity.VIEW_NAME_HEADER_TITLE));
-
-                // Now we can start the Activity, providing the activity options as a bundle
-                ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
-                // END_INCLUDE(start_activity)
+//                Intent intent = new Intent(getActivity(), DetailActivity.class);
+//                intent.putExtra(DetailActivity.EXTRA_PARAM_ID, note.getId());
+//
+//                @SuppressWarnings("unchecked")
+//                ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                        getActivity(),
+//                        new Pair<>(view.findViewById(R.id.imageview_item),
+//                                DetailActivity.VIEW_NAME_HEADER_IMAGE),
+//                        new Pair<>(view.findViewById(R.id.textview_name),
+//                                DetailActivity.VIEW_NAME_HEADER_TITLE));
+//                ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
             }
         }, getListNotes());
         recyclerView.setAdapter(adapter);
@@ -107,14 +94,16 @@ public class HomeFragment extends Fragment {
         Cursor cursor = myDB.readAllNote();
         if(cursor.getCount() != 0){
             while (cursor.moveToNext()){
+                Bitmap bitmap = null;
                 byte[] blob = cursor.getBlob(4);
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(blob);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                if (blob != null) {
+                    bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
+                }
 
                 notes.add(new Note(Integer.parseInt(cursor.getString(0))
                         ,cursor.getString(1)
                         ,cursor.getString(2)
-                        ,cursor.getString(3)
+                        ,Integer.parseInt(cursor.getString(3))
                         ,bitmap
                         ,Integer.parseInt(cursor.getString(5))
                 ));
@@ -122,18 +111,6 @@ public class HomeFragment extends Fragment {
         }
 
         return notes;
-    }
-
-    public Bitmap StringToBitMap(String encodedString) {
-        try {
-            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0,
-                    encodeByte.length);
-            return bitmap;
-        } catch (Exception e) {
-            e.getMessage();
-            return null;
-        }
     }
 
     private void init() {

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -12,7 +13,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -27,7 +31,13 @@ import android.widget.Toast;
 import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
 import com.example.namkeep.ui.gallery.PhotoAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +46,15 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private EditText mTitle, mContent;
-    private ImageView mBackground, mImageNote;
     private Uri imagePath;
-    private Bitmap imageToStore;
+    private Bitmap imageToStore, imageBackground;
     private CoordinatorLayout mMainAddNote;
+    private RoundedImageView mRoundedImageColor;
 
     DatabaseHelper myDB;
-
     List<Bitmap> listBitmap = new ArrayList<>();
 
+    private int colorNote = Color.rgb(255,255,255);
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -64,10 +74,13 @@ public class AddNoteActivity extends AppCompatActivity {
         mTitle = findViewById(R.id.title_note);
         mContent = findViewById(R.id.content_note);
         mMainAddNote = findViewById(R.id.main_container_add_note);
+        mRoundedImageColor = findViewById(R.id.color_background_imaged);
 
         findViewById(R.id.bottom_app_bar_add_note).setBackground(null);
 
         Button mSheetAddButton = findViewById(R.id.sheet_add_note_button);
+        Button mSheetColorButton = findViewById(R.id.sheet_color_note_button);
+
         mSheetAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,32 +102,212 @@ public class AddNoteActivity extends AppCompatActivity {
                 bottomSheetDialog.show();
             }
         });
+
+        mSheetColorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(AddNoteActivity.this);
+                View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                        .inflate(
+                                R.layout.layout_bottom_sheet_color_note,null
+                        );
+                bottomActionColorImage(bottomSheetView);
+
+                bottomSheetDialog.setContentView(bottomSheetView);
+                bottomSheetDialog.show();
+            }
+        });
+    }
+
+    private void checkBackgroundColorOrImage(int color) {
+        if (imageBackground != null) {
+            if(colorNote == Color.rgb(255,255,255)) {
+                mRoundedImageColor.setBackground(null);
+            } else {
+                mRoundedImageColor.setBackgroundColor(color);
+            }
+        }else {
+            mRoundedImageColor.setBackground(null);
+            mMainAddNote.setBackgroundColor(color);
+        }
+    }
+
+    private void bottomActionColorImage(View bottomSheetView) {
+        bottomSheetView.findViewById(R.id.color_note_default).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(255,255,255);
+
+                if (imageBackground == null) {
+                    mRoundedImageColor.setBackground(null);
+                    mMainAddNote.setBackground(null);
+                } else {
+                    mRoundedImageColor.setBackground(null);
+                }
+            }
+        });
+        bottomSheetView.findViewById(R.id.color_note_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(250,175,168);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.color_note_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(243,159,118);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.color_note_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(255,248,184);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.color_note_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(226,246,211);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.color_note_5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(180,221,221);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.color_note_6).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                colorNote = Color.rgb(212,228,237);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+
+//        image background
+        bottomSheetView.findViewById(R.id.image_note_default).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkBackgroundColorOrImage(colorNote);
+                imageBackground = null;
+                checkBackgroundColorOrImage(colorNote);
+
+            }
+        });
+        bottomSheetView.findViewById(R.id.image_note_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable drawable = ContextCompat.getDrawable(AddNoteActivity.this, R.drawable.gg1);
+                imageBackground = ((BitmapDrawable)drawable).getBitmap();
+                mMainAddNote.setBackground(drawable);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.image_note_2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable drawable = ContextCompat.getDrawable(AddNoteActivity.this, R.drawable.gg2);
+                imageBackground = ((BitmapDrawable)drawable).getBitmap();
+                mMainAddNote.setBackground(drawable);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.image_note_3).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable drawable = ContextCompat.getDrawable(AddNoteActivity.this, R.drawable.gg3);
+                imageBackground = ((BitmapDrawable)drawable).getBitmap();
+                mMainAddNote.setBackground(drawable);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.image_note_4).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable drawable = ContextCompat.getDrawable(AddNoteActivity.this, R.drawable.gg4);
+                imageBackground = ((BitmapDrawable)drawable).getBitmap();
+                mMainAddNote.setBackground(drawable);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+        bottomSheetView.findViewById(R.id.image_note_5).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Drawable drawable = ContextCompat.getDrawable(AddNoteActivity.this, R.drawable.gg5);
+                imageBackground = ((BitmapDrawable)drawable).getBitmap();
+                mMainAddNote.setBackground(drawable);
+                checkBackgroundColorOrImage(colorNote);
+            }
+        });
+    }
+
+    private ArrayList<Bitmap> getListImages(int idNote) {
+        ArrayList<Bitmap> list = new ArrayList<>();
+
+        if (idNote != 0){
+            Cursor cursor = myDB.readNoteImage(idNote);
+            if(cursor.getCount() != 0 ){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (cursor.moveToNext()){
+                            if (cursor.getCount() != list.size()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Bitmap bitmap = null;
+                                        byte[] blob = cursor.getBlob(1);
+                                        if (blob != null) {
+                                            bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
+                                        }
+                                        list.add(bitmap);
+                                    }
+                                });
+
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }}
+                    }
+                }).start();
+            }
+        }
+        return list;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        myDB.addNote(mTitle.getText().toString(), mContent.getText().toString(), "red", imageToStore, 1);
+        myDB.addNote(mTitle.getText().toString(), mContent.getText().toString(), colorNote, imageBackground, 1);
+
+        for (Bitmap bitmap : listBitmap) {
+            myDB.addImage(bitmap, myDB.getNoteIdNew());
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             imagePath = data.getData();
             try {
                 imageToStore = MediaStore.Images.Media.getBitmap(getContentResolver(), imagePath);
 //                BitmapDrawable ob = new BitmapDrawable(getResources(), imageToStore);
 //                mMainAddNote.setBackground(ob);
-//                mImageNote = findViewById(R.id.imageViewHihi);
-//                mImageNote.setImageBitmap(imageToStore);
                 listBitmap.add(imageToStore);
                 addListImage();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//        }
+        }
     }
 
     private void addListImage() {
@@ -124,17 +317,4 @@ public class AddNoteActivity extends AppCompatActivity {
         mainImagesNote.setAdapter(adapter);
     }
 
-//    private String getPath(Uri uri) {
-//        if(uri == null){
-//            return null;
-//        }
-//        String[] projection = {MediaStore.Images.Media.DATA};
-//        Cursor cursor = managedQuery(uri, projection, null, null, null);
-//        if (cursor != null) {
-//            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//            cursor.moveToFirst();
-//            return cursor.getString(column_index);
-//        }
-//        return uri.getPath();
-//    }
 }

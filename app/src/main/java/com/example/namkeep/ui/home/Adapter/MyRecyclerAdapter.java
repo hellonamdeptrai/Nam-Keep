@@ -2,16 +2,26 @@ package com.example.namkeep.ui.home.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.icu.util.TimeUnit;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
+import com.example.namkeep.DatabaseHelper;
+import com.example.namkeep.MainActivity;
 import com.example.namkeep.R;
 import com.example.namkeep.object.Note;
 import com.example.namkeep.ui.home.Helper.IClickItemDetail;
@@ -21,6 +31,7 @@ import com.example.namkeep.ui.home.Item;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +46,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     private Activity activity;
     OnStartDangListener listener;
     private ArrayList<Note> notesList;
+    DatabaseHelper myDB;
 //    row_id, title, content, color, background, categoryId
 
     private IClickItemDetail iClickItemDetail;
@@ -45,6 +57,8 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         this.listener = listener;
         this.iClickItemDetail = iClickItemDetail;
         this.notesList = notesList;
+
+        myDB = new DatabaseHelper(context);
 //        this.row_id = row_id;
 //        this.title = title;
 //        this.content = content;
@@ -64,9 +78,15 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         final Note noteItem = notesList.get(position);
 
 //        Picasso.with(holder.image.getContext()).load(item.getThumbnailUrl()).into(holder.image);
-        holder.image.setImageBitmap(noteItem.getBackground());
+//        holder.imageBackground.setImageBitmap(noteItem.getBackground());
 
-        holder.name.setText(noteItem.getTitle());
+        holder.title.setText(noteItem.getTitle());
+        holder.content.setText(noteItem.getContent());
+
+        holder.mainImagesNoteHome.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+        RecyclerImagesNoteAdapter adapter = new RecyclerImagesNoteAdapter(getListImages(noteItem.getId()));
+        holder.mainImagesNoteHome.setAdapter(adapter);
+
         holder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -74,6 +94,8 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
                 return false;
             }
         });
+//        BitmapDrawable ob = new BitmapDrawable(holder.itemView.getContext().getResources(), noteItem.getBackground());
+//        holder.linearLayout.setBackground(ob);
         holder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,21 +125,90 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         notifyItemRemoved(position);
     }
 
+    private ArrayList<Bitmap> getListImages(int idNote) {
+        ArrayList<Bitmap> list = new ArrayList<>();
+
+        if (idNote != 0){
+            Cursor cursor = myDB.readNoteImage(idNote);
+            if(cursor.getCount() != 0 ){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (cursor.moveToNext()){
+                            if (cursor.getCount() != list.size()) {
+                            ((MainActivity)context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Bitmap bitmap = null;
+                                    byte[] blob = cursor.getBlob(1);
+                                    if (blob != null) {
+                                        bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
+                                    }
+                                    list.add(bitmap);
+//                                    Toast.makeText(context, list.size()+""+cursor.getCount(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }}
+                    }
+                }).start();
+            }
+        }
+
+        return list;
+    }
+
+//    private ArrayList<Bitmap> getListImages(int idNote) {
+//        ArrayList<Bitmap> list = new ArrayList<>();
+//
+//        if (idNote != 0){
+//            Cursor cursor = myDB.readNoteImage(idNote);
+//            boolean a = true;
+//            if(cursor.getCount() != 0){
+//                while (cursor.moveToFirst()&&a){
+//                    try {
+//                        Bitmap bitmap = null;
+//
+//
+//                        byte[] blob = cursor.getBlob(1);
+//                        if (blob != null) {
+//                            ByteArrayInputStream inputStream = new ByteArrayInputStream(blob);
+//                            Thread.sleep( 1000);
+//                            bitmap = BitmapFactory.decodeStream(inputStream);
+//                        }
+//                        list.add(bitmap);
+//                        a = false;
+//                    } catch (InterruptedException ie) {
+//                        Thread.currentThread().interrupt();
+//                    }
+//
+//                }
+//            }
+//        }
+//        return list;
+//    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.imageview_item)
-        RoundedImageView image;
-
-        @BindView(R.id.textview_name)
-        TextView name;
-
-        @BindView(R.id.layout_item)
+        ImageView imageBackground;
+        TextView title, content;
         LinearLayout linearLayout;
+        RecyclerView mainImagesNoteHome;
 
         Unbinder unbinder;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             unbinder = ButterKnife.bind(this, itemView);
+            imageBackground = itemView.findViewById(R.id.imageview_item);
+            title = itemView.findViewById(R.id.title_note_home);
+            content = itemView.findViewById(R.id.content_note_home);
+            linearLayout = itemView.findViewById(R.id.layout_item);
+            mainImagesNoteHome = itemView.findViewById(R.id.main_images_note_home);
         }
     }
 }
