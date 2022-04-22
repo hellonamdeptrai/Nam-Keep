@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -24,11 +25,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.namkeep.Adapter.IClickDeleteCheckBox;
+import com.example.namkeep.Adapter.RecyclerCheckBoxNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
+import com.example.namkeep.object.CheckBoxContentNote;
 import com.example.namkeep.ui.gallery.PhotoAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -53,8 +58,10 @@ public class AddNoteActivity extends AppCompatActivity {
 
     DatabaseHelper myDB;
     List<Bitmap> listBitmap = new ArrayList<>();
+    List<CheckBoxContentNote> listCheckBox = new ArrayList<>();
 
     private int colorNote = Color.rgb(255,255,255);
+    private int isCheckBoxOrContent = 0;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -98,6 +105,12 @@ public class AddNoteActivity extends AppCompatActivity {
                         startActivityForResult(intent, PICK_IMAGE_REQUEST);
                     }
                 });
+                bottomSheetView.findViewById(R.id.add_checkbox_note).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        changeTextToCheckbox();
+                    }
+                });
                 bottomSheetDialog.setContentView(bottomSheetView);
                 bottomSheetDialog.show();
             }
@@ -117,6 +130,51 @@ public class AddNoteActivity extends AppCompatActivity {
                 bottomSheetDialog.show();
             }
         });
+    }
+
+    private void changeTextToCheckbox() {
+        String[] arr = mContent.getText().toString().split("\n");
+
+        if (isCheckBoxOrContent == 0) {
+            for (int i = 0; i < arr.length; i++) {
+                listCheckBox.add(new CheckBoxContentNote(arr[i],false));
+            }
+            mContent.setVisibility(View.GONE);;
+            isCheckBoxOrContent = 1;
+        } else {
+            endCheckBoxList();
+        }
+        addListCheckBox(listCheckBox);
+    }
+
+    private void endCheckBoxList(){
+        String data = "";
+        for (int i = 0; i < listCheckBox.size(); i++) {
+            String row = "";
+            row = row + listCheckBox.get(i).getContent() + "\n";
+            data += row;
+        }
+        mContent.setVisibility(View.VISIBLE);
+        mContent.setText(data);
+        listCheckBox = new ArrayList<>();
+        isCheckBoxOrContent = 0;
+    }
+
+    private void addListCheckBox(List<CheckBoxContentNote> list) {
+        RecyclerView mainCheckBoxNote = findViewById(R.id.main_checkbox_note);
+
+        mainCheckBoxNote.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        RecyclerCheckBoxNoteAdapter adapter = new RecyclerCheckBoxNoteAdapter(this, list, new IClickDeleteCheckBox() {
+            @Override
+            public void onClickItemTour(int position) {
+                listCheckBox.remove(position);
+                addListCheckBox(listCheckBox);
+                if(listCheckBox.size() == 0){
+                    endCheckBoxList();
+                }
+            }
+        });
+        mainCheckBoxNote.setAdapter(adapter);
     }
 
     private void checkBackgroundColorOrImage(int color) {

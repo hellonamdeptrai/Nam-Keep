@@ -6,15 +6,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.icu.util.TimeUnit;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,16 +24,10 @@ import com.example.namkeep.object.Note;
 import com.example.namkeep.ui.home.Helper.IClickItemDetail;
 import com.example.namkeep.ui.home.Helper.ItemTouchHelperAdapter;
 import com.example.namkeep.ui.home.Helper.OnStartDangListener;
-import com.example.namkeep.ui.home.Item;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -64,7 +54,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MyViewHolder(LayoutInflater.from(context).inflate(R.layout.mission_item_home, parent, false));
+        return new MyViewHolder(LayoutInflater.from(context).inflate(R.layout.item_home, parent, false));
     }
 
     @Override
