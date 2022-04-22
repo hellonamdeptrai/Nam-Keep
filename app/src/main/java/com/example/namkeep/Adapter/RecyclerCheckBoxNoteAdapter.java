@@ -5,9 +5,11 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -18,19 +20,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.namkeep.R;
 import com.example.namkeep.object.CheckBoxContentNote;
+import com.example.namkeep.ui.home.Helper.ItemTouchHelperAdapter;
+import com.example.namkeep.ui.home.Helper.OnStartDangListener;
 
 import java.util.List;
 
-public class RecyclerCheckBoxNoteAdapter extends RecyclerView.Adapter<RecyclerCheckBoxNoteAdapter.CheckBoxNoteViewHolder> {
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
+public class RecyclerCheckBoxNoteAdapter extends RecyclerView.Adapter<RecyclerCheckBoxNoteAdapter.CheckBoxNoteViewHolder> implements ItemTouchHelperAdapter {
 
     private List<CheckBoxContentNote> list;
     private Context context;
     private IClickDeleteCheckBox iClickDeleteCheckBox;
+    private ITextWatcherCheckBox iTextWatcherCheckBox;
+    private IClickChecked iClickChecked;
+    OnStartDangListener listener;
 
-    public RecyclerCheckBoxNoteAdapter(Context context,List<CheckBoxContentNote> list,IClickDeleteCheckBox iClickDeleteCheckBox) {
+    public RecyclerCheckBoxNoteAdapter(Context context,List<CheckBoxContentNote> list,
+                                       IClickDeleteCheckBox iClickDeleteCheckBox,
+                                       ITextWatcherCheckBox iTextWatcherCheckBox,
+                                       OnStartDangListener listener,
+                                       IClickChecked iClickChecked) {
         this.list = list;
         this.context = context;
         this.iClickDeleteCheckBox = iClickDeleteCheckBox;
+        this.iTextWatcherCheckBox = iTextWatcherCheckBox;
+        this.listener =listener;
+        this.iClickChecked = iClickChecked;
     }
 
     @NonNull
@@ -44,11 +61,44 @@ public class RecyclerCheckBoxNoteAdapter extends RecyclerView.Adapter<RecyclerCh
         final CheckBoxContentNote checkBoxItem = list.get(position);
 
         holder.checkBox.setChecked(checkBoxItem.isCheckBox());
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                iClickChecked.ClickChecked(position, holder.editText);
+            }
+        });
         holder.editText.setText(checkBoxItem.getContent());
+        holder.editText.setEnabled(!checkBoxItem.isCheckBox());
+        holder.editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                iTextWatcherCheckBox.TextWatcherItem(position, holder.editText.getText().toString());
+            }
+        });
         holder.mDeleteItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iClickDeleteCheckBox.onClickItemTour(position);
+                iClickDeleteCheckBox.onClickDeleteItem(position);
+            }
+        });
+        holder.mDragItem.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                final int action = motionEvent.getAction();
+                if (action == MotionEvent.ACTION_DOWN) {
+                    listener.onStartDrag(holder);
+                }
+                return false;
             }
         });
     }
@@ -58,19 +108,33 @@ public class RecyclerCheckBoxNoteAdapter extends RecyclerView.Adapter<RecyclerCh
         return list.size();
     }
 
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void inItemDismiss(int position) {
+        notifyItemRemoved(position);
+    }
+
     public class CheckBoxNoteViewHolder extends RecyclerView.ViewHolder {
         CheckBox checkBox;
         EditText editText;
-        ImageButton mDeleteItem;
+        ImageButton mDeleteItem, mDragItem;
         EditText mEditTextCheckBox;
         LinearLayout linearLayout;
+        Unbinder unbinder;
 
         public CheckBoxNoteViewHolder(@NonNull View itemView) {
             super(itemView);
+            unbinder = ButterKnife.bind(this, itemView);
             checkBox = itemView.findViewById(R.id.check_box_note);
             editText = itemView.findViewById(R.id.edit_text_check_box);
             mDeleteItem = itemView.findViewById(R.id.image_button_delete_item);
             mEditTextCheckBox = itemView.findViewById(R.id.edit_text_check_box);
+            mDragItem = itemView.findViewById(R.id.image_button_drag);
             linearLayout = itemView.findViewById(R.id.main_check_box_item);
         }
     }

@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -30,11 +31,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.namkeep.Adapter.IClickChecked;
 import com.example.namkeep.Adapter.IClickDeleteCheckBox;
+import com.example.namkeep.Adapter.ITextWatcherCheckBox;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
 import com.example.namkeep.object.CheckBoxContentNote;
 import com.example.namkeep.ui.gallery.PhotoAdapter;
+import com.example.namkeep.ui.home.Helper.MyItemTouchHelperCallback;
+import com.example.namkeep.ui.home.Helper.OnStartDangListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -55,6 +60,8 @@ public class AddNoteActivity extends AppCompatActivity {
     private Bitmap imageToStore, imageBackground;
     private CoordinatorLayout mMainAddNote;
     private RoundedImageView mRoundedImageColor;
+    private Button addCheckBox;
+    ItemTouchHelper itemTouchHelper;
 
     DatabaseHelper myDB;
     List<Bitmap> listBitmap = new ArrayList<>();
@@ -130,25 +137,38 @@ public class AddNoteActivity extends AppCompatActivity {
                 bottomSheetDialog.show();
             }
         });
+
+
     }
 
     private void changeTextToCheckbox() {
         String[] arr = mContent.getText().toString().split("\n");
+        addCheckBox = findViewById(R.id.bottom_add_check_box);
 
         if (isCheckBoxOrContent == 0) {
             for (int i = 0; i < arr.length; i++) {
                 listCheckBox.add(new CheckBoxContentNote(arr[i],false));
             }
-            mContent.setVisibility(View.GONE);;
+            mContent.setVisibility(View.GONE);
+            addCheckBox.setVisibility(View.VISIBLE);
             isCheckBoxOrContent = 1;
         } else {
             endCheckBoxList();
         }
         addListCheckBox(listCheckBox);
+        addCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editTextIdCheckBox();
+                listCheckBox.add(new CheckBoxContentNote());
+                addListCheckBox(listCheckBox);
+            }
+        });
     }
 
     private void endCheckBoxList(){
         String data = "";
+        editTextIdCheckBox();
         for (int i = 0; i < listCheckBox.size(); i++) {
             String row = "";
             row = row + listCheckBox.get(i).getContent() + "\n";
@@ -156,8 +176,18 @@ public class AddNoteActivity extends AppCompatActivity {
         }
         mContent.setVisibility(View.VISIBLE);
         mContent.setText(data);
+        addCheckBox.setVisibility(View.GONE);
         listCheckBox = new ArrayList<>();
         isCheckBoxOrContent = 0;
+    }
+
+    private void editTextIdCheckBox() {
+        for (int i = 0; i < listCheckBox.size(); i++) {
+            if (listCheckBox.get(i).getContent().startsWith("!!$")) {
+                listCheckBox.get(i).setContent(listCheckBox.get(i).getContent().substring(3));
+                listCheckBox.get(i).setCheckBox(true);
+            }
+        }
     }
 
     private void addListCheckBox(List<CheckBoxContentNote> list) {
@@ -166,15 +196,43 @@ public class AddNoteActivity extends AppCompatActivity {
         mainCheckBoxNote.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         RecyclerCheckBoxNoteAdapter adapter = new RecyclerCheckBoxNoteAdapter(this, list, new IClickDeleteCheckBox() {
             @Override
-            public void onClickItemTour(int position) {
+            public void onClickDeleteItem(int position) {
                 listCheckBox.remove(position);
                 addListCheckBox(listCheckBox);
-                if(listCheckBox.size() == 0){
+                if (listCheckBox.size() == 0) {
                     endCheckBoxList();
                 }
             }
+        }, new ITextWatcherCheckBox() {
+            @Override
+            public void TextWatcherItem(int position, String text) {
+                listCheckBox.get(position).setContent(text);
+            }
+        }, new OnStartDangListener() {
+            @Override
+            public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+                itemTouchHelper.startDrag(viewHolder);
+            }
+        }, new IClickChecked() {
+            @Override
+            public void ClickChecked(int position, EditText editText) {
+
+                if (listCheckBox.get(position).getContent().startsWith("!!$")) {
+                    listCheckBox.get(position).setContent(listCheckBox.get(position).getContent().substring(3));
+                    listCheckBox.get(position).setCheckBox(false);
+                    editText.setEnabled(true);
+                } else {
+                    listCheckBox.get(position).setContent("!!$"+editText.getText().toString());
+                    listCheckBox.get(position).setCheckBox(true);
+                    editText.setEnabled(false);
+                }
+
+            }
         });
         mainCheckBoxNote.setAdapter(adapter);
+        ItemTouchHelper.Callback callback = new MyItemTouchHelperCallback(adapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(mainCheckBoxNote);
     }
 
     private void checkBackgroundColorOrImage(int color) {

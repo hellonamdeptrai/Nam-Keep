@@ -5,5 +5,5 @@ import android.view.View;
 import com.example.namkeep.object.Note;
 
 public interface IClickItemDetail {
-    void onClickItemTour(View view, Note note);
+    void onClickItemNote(View view, Note note);
 }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.namkeep.DatabaseHelper;
 import com.example.namkeep.R;
@@ -32,12 +34,14 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private FragmentHomeBinding binding;
     RecyclerView recyclerView;
     ItemTouchHelper itemTouchHelper;
     DatabaseHelper myDB;
+    SwipeRefreshLayout swipeRefreshLayout;
+    MyRecyclerAdapter adapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,19 +50,21 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
         recyclerView = binding.mainRecycler;
+        swipeRefreshLayout = root.findViewById(R.id.refresh_note_home);
         myDB = new DatabaseHelper(getActivity());
         init();
         generateItem();
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         return root;
     }
 
     public void generateItem() {
-        MyRecyclerAdapter adapter = new MyRecyclerAdapter(getActivity(), viewHolder -> {
+        adapter = new MyRecyclerAdapter(getActivity(), viewHolder -> {
             itemTouchHelper.startDrag(viewHolder);
         }, new IClickItemDetail() {
             @Override
-            public void onClickItemTour(View view, Note note) {
+            public void onClickItemNote(View view, Note note) {
                 Intent intent = new Intent(getActivity(), EditNoteActivity.class);
                 intent.putExtra(EditNoteActivity.EXTRA_PARAM_ID, note.getId());
                 intent.putExtra(EditNoteActivity.VIEW_NAME_TITLE, note.getTitle());
@@ -87,7 +93,8 @@ public class HomeFragment extends Fragment {
                         isColorData);
                 ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
             }
-        }, getListNotes());
+        });
+        adapter.setData(getListNotes());
         recyclerView.setAdapter(adapter);
         ItemTouchHelper.Callback callback = new MyItemTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
@@ -129,5 +136,16 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onRefresh() {
+        adapter.setData(getListNotes());
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 2000);
     }
 }

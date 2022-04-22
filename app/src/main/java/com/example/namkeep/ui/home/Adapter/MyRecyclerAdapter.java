@@ -24,6 +24,7 @@ import com.example.namkeep.object.Note;
 import com.example.namkeep.ui.home.Helper.IClickItemDetail;
 import com.example.namkeep.ui.home.Helper.ItemTouchHelperAdapter;
 import com.example.namkeep.ui.home.Helper.OnStartDangListener;
+import com.example.namkeep.ui.home.HomeFragment;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -41,14 +42,16 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
 
     private IClickItemDetail iClickItemDetail;
 
-    public MyRecyclerAdapter(Context context, OnStartDangListener listener, IClickItemDetail iClickItemDetail
-    ,ArrayList<Note> notesList) {
+    public MyRecyclerAdapter(Context context, OnStartDangListener listener, IClickItemDetail iClickItemDetail) {
         this.context = context;
         this.listener = listener;
         this.iClickItemDetail = iClickItemDetail;
-        this.notesList = notesList;
 
         myDB = new DatabaseHelper(context);
+    }
+
+    public void setData(ArrayList<Note> notesList) {
+        this.notesList = notesList;
     }
 
     @NonNull
@@ -85,7 +88,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         holder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                iClickItemDetail.onClickItemTour(view ,noteItem);
+                iClickItemDetail.onClickItemNote(view ,noteItem);
             }
         });
     }
@@ -135,7 +138,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
                             });
 
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(500);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
