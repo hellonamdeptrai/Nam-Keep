@@ -5,17 +5,11 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -23,7 +17,6 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -34,12 +27,8 @@ import com.example.namkeep.object.Note;
 import com.example.namkeep.ui.home.Adapter.MyRecyclerAdapter;
 import com.example.namkeep.ui.home.Helper.IClickItemDetail;
 import com.example.namkeep.ui.home.Helper.MyItemTouchHelperCallback;
-import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.ButterKnife;
 
@@ -70,17 +59,33 @@ public class HomeFragment extends Fragment {
         }, new IClickItemDetail() {
             @Override
             public void onClickItemTour(View view, Note note) {
-//                Intent intent = new Intent(getActivity(), DetailActivity.class);
-//                intent.putExtra(DetailActivity.EXTRA_PARAM_ID, note.getId());
-//
-//                @SuppressWarnings("unchecked")
-//                ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                        getActivity(),
-//                        new Pair<>(view.findViewById(R.id.imageview_item),
-//                                DetailActivity.VIEW_NAME_HEADER_IMAGE),
-//                        new Pair<>(view.findViewById(R.id.textview_name),
-//                                DetailActivity.VIEW_NAME_HEADER_TITLE));
-//                ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
+                Intent intent = new Intent(getActivity(), EditNoteActivity.class);
+                intent.putExtra(EditNoteActivity.EXTRA_PARAM_ID, note.getId());
+                intent.putExtra(EditNoteActivity.VIEW_NAME_TITLE, note.getTitle());
+                intent.putExtra(EditNoteActivity.VIEW_NAME_CONTENT, note.getContent());
+                intent.putExtra(EditNoteActivity.VIEW_NAME_BACKGROUND, note.getBackground());
+                intent.putExtra(EditNoteActivity.VIEW_NAME_EDIT_COLOR, note.getColor());
+
+                Pair isColorData;
+                if (note.getColor() != Color.rgb(255,255,255)) {
+                    isColorData = new Pair<>(view.findViewById(R.id.color_background_imaged_home),
+                            EditNoteActivity.VIEW_NAME_EDIT_COLOR);
+                } else {
+                    isColorData = new Pair<>(view.findViewById(R.id.content_note_home),
+                            EditNoteActivity.VIEW_NAME_EDIT_COLOR);
+                }
+
+                @SuppressWarnings("unchecked")
+                ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        getActivity(),
+                        new Pair<>(view.findViewById(R.id.main_images_note_home),
+                                EditNoteActivity.VIEW_NAME_IMAGE),
+                        new Pair<>(view.findViewById(R.id.title_note_home),
+                                EditNoteActivity.VIEW_NAME_TITLE),
+                        new Pair<>(view.findViewById(R.id.content_note_home),
+                                EditNoteActivity.VIEW_NAME_CONTENT),
+                        isColorData);
+                ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
             }
         }, getListNotes());
         recyclerView.setAdapter(adapter);
@@ -94,17 +99,17 @@ public class HomeFragment extends Fragment {
         Cursor cursor = myDB.readAllNote();
         if(cursor.getCount() != 0){
             while (cursor.moveToNext()){
-                Bitmap bitmap = null;
                 byte[] blob = cursor.getBlob(4);
-                if (blob != null) {
-                    bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
-                }
+//                Bitmap bitmap = null;
+//                if (blob != null) {
+//                    bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
+//                }
 
                 notes.add(new Note(Integer.parseInt(cursor.getString(0))
                         ,cursor.getString(1)
                         ,cursor.getString(2)
                         ,Integer.parseInt(cursor.getString(3))
-                        ,bitmap
+                        ,blob
                         ,Integer.parseInt(cursor.getString(5))
                 ));
             }

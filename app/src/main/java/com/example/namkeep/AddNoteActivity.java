@@ -246,42 +246,6 @@ public class AddNoteActivity extends AppCompatActivity {
         });
     }
 
-    private ArrayList<Bitmap> getListImages(int idNote) {
-        ArrayList<Bitmap> list = new ArrayList<>();
-
-        if (idNote != 0){
-            Cursor cursor = myDB.readNoteImage(idNote);
-            if(cursor.getCount() != 0 ){
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (cursor.moveToNext()){
-                            if (cursor.getCount() != list.size()) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Bitmap bitmap = null;
-                                        byte[] blob = cursor.getBlob(1);
-                                        if (blob != null) {
-                                            bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
-                                        }
-                                        list.add(bitmap);
-                                    }
-                                });
-
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }}
-                    }
-                }).start();
-            }
-        }
-        return list;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

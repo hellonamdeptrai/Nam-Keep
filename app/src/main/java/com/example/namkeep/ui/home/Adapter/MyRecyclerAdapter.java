@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.icu.util.TimeUnit;
 import android.view.LayoutInflater;
@@ -47,7 +48,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     OnStartDangListener listener;
     private ArrayList<Note> notesList;
     DatabaseHelper myDB;
-//    row_id, title, content, color, background, categoryId
 
     private IClickItemDetail iClickItemDetail;
 
@@ -59,12 +59,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         this.notesList = notesList;
 
         myDB = new DatabaseHelper(context);
-//        this.row_id = row_id;
-//        this.title = title;
-//        this.content = content;
-//        this.color = color;
-//        this.background = background;
-//        this.categoryId = categoryId;
     }
 
     @NonNull
@@ -77,11 +71,13 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         final Note noteItem = notesList.get(position);
 
-//        Picasso.with(holder.image.getContext()).load(item.getThumbnailUrl()).into(holder.image);
-//        holder.imageBackground.setImageBitmap(noteItem.getBackground());
-
         holder.title.setText(noteItem.getTitle());
         holder.content.setText(noteItem.getContent());
+        if (noteItem.getColor() != Color.rgb(255,255,255)){
+            holder.colorBackgroundImagedHome.setBackgroundColor(noteItem.getColor());
+        }else {
+            holder.colorBackgroundImagedHome.setVisibility(View.GONE);
+        }
 
         holder.mainImagesNoteHome.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
         RecyclerImagesNoteAdapter adapter = new RecyclerImagesNoteAdapter(getListImages(noteItem.getId()));
@@ -145,7 +141,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
                                         bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
                                     }
                                     list.add(bitmap);
-//                                    Toast.makeText(context, list.size()+""+cursor.getCount(), Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -163,52 +158,22 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
         return list;
     }
 
-//    private ArrayList<Bitmap> getListImages(int idNote) {
-//        ArrayList<Bitmap> list = new ArrayList<>();
-//
-//        if (idNote != 0){
-//            Cursor cursor = myDB.readNoteImage(idNote);
-//            boolean a = true;
-//            if(cursor.getCount() != 0){
-//                while (cursor.moveToFirst()&&a){
-//                    try {
-//                        Bitmap bitmap = null;
-//
-//
-//                        byte[] blob = cursor.getBlob(1);
-//                        if (blob != null) {
-//                            ByteArrayInputStream inputStream = new ByteArrayInputStream(blob);
-//                            Thread.sleep( 1000);
-//                            bitmap = BitmapFactory.decodeStream(inputStream);
-//                        }
-//                        list.add(bitmap);
-//                        a = false;
-//                    } catch (InterruptedException ie) {
-//                        Thread.currentThread().interrupt();
-//                    }
-//
-//                }
-//            }
-//        }
-//        return list;
-//    }
-
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageBackground;
         TextView title, content;
         LinearLayout linearLayout;
         RecyclerView mainImagesNoteHome;
+        RoundedImageView colorBackgroundImagedHome;
 
         Unbinder unbinder;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             unbinder = ButterKnife.bind(this, itemView);
-            imageBackground = itemView.findViewById(R.id.imageview_item);
             title = itemView.findViewById(R.id.title_note_home);
             content = itemView.findViewById(R.id.content_note_home);
             linearLayout = itemView.findViewById(R.id.layout_item);
             mainImagesNoteHome = itemView.findViewById(R.id.main_images_note_home);
+            colorBackgroundImagedHome = itemView.findViewById(R.id.color_background_imaged_home);
         }
     }
 }

@@ -7,12 +7,12 @@ public class Note {
     private String title;
     private String content;
     private int color;
-    private Bitmap background;
+    private byte[] background;
     private int categoryId;
 
     public Note() {}
 
-    public Note(int id, String title, String content, int color, Bitmap background, int categoryId) {
+    public Note(int id, String title, String content, int color, byte[] background, int categoryId) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -53,11 +53,11 @@ public class Note {
         this.color = color;
     }
 
-    public Bitmap getBackground() {
+    public byte[] getBackground() {
         return background;
     }
 
-    public void setBackground(Bitmap background) {
+    public void setBackground(byte[] background) {
         this.background = background;
     }
 
