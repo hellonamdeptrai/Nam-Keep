@@ -131,7 +131,7 @@
             android:id="@+id/edit_sheet_add_note_button"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_baseline_check_box_24"
+            app:icon="@drawable/ic_baseline_add_box_24"
             app:iconTint="@color/black"
             android:paddingLeft="10dp"
             style="?android:attr/borderlessButtonStyle"/>

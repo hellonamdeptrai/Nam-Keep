@@ -6,15 +6,11 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo_google_keep"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/logo_google_keep"
         android:supportsRtl="true"
         android:theme="@style/Theme.NamKeep">
-        <activity
-            android:name=".DetailImageActivity"
-            android:exported="false"
-            android:parentActivityName=".AddNoteActivity"/>
         <activity
             android:name=".AddNoteActivity"
             android:exported="false"
