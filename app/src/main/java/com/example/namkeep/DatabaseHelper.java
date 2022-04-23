@@ -136,7 +136,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    void deleteOneRow(String row_id){
+    public void deleteOneRow(String row_id){
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete(TABLE_NOTE, "_id=?", new String[]{row_id});
         if(result == -1){
@@ -153,7 +153,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 //    -----------------
 
-    void addImage(Bitmap image, int noteId){
+    public void addImage(Bitmap image, int noteId){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -189,11 +189,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cv.put(IMAGE_COLUMN_BITMAP, imageInByte);
 
-        long result = db.update(TABLE_NOTE, cv, "_id=?", new String[]{id});
+        long result = db.update(TABLE_IMAGE, cv, "_id=?", new String[]{id});
         if(result == -1){
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         }else {
             Toast.makeText(context, "Updated Images Successfully!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteOneRowImage (String row_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.delete(TABLE_IMAGE, "_id=?", new String[]{row_id});
+        if(result == -1){
+            Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(context, "Successfully Image Deleted.", Toast.LENGTH_SHORT).show();
         }
     }
 

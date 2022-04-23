@@ -16,6 +16,7 @@
 
 package com.example.namkeep.ui.home;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -39,6 +40,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -62,6 +64,7 @@ import com.example.namkeep.DatabaseHelper;
 import com.example.namkeep.MainActivity;
 import com.example.namkeep.R;
 import com.example.namkeep.object.CheckBoxContentNote;
+import com.example.namkeep.object.Image;
 import com.example.namkeep.ui.home.Helper.MyItemTouchHelperCallback;
 import com.example.namkeep.ui.home.Helper.OnStartDangListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -108,6 +111,8 @@ public class EditNoteActivity extends AppCompatActivity {
     byte[] backgroundImage;
 
     private ArrayList<Bitmap> listBitmap;
+    private ArrayList<Image> listImage;
+
     List<CheckBoxContentNote> listCheckBox = new ArrayList<>();
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -204,8 +209,32 @@ public class EditNoteActivity extends AppCompatActivity {
                 bottomSheetView.findViewById(R.id.delete_add_note).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        isSaveData = false;
-                        finish();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(EditNoteActivity.this);
+                        builder.setTitle("Xóa ghi chú ?");
+                        builder.setMessage("Bạn có chắc chắn muốn xóa ghi chú này không ?");
+                        builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                isSaveData = false;
+                                myDB.deleteOneRow(idNote+"");
+                                for (Image image: listImage) {
+                                    myDB.deleteOneRowImage(image.getId()+"");
+                                }
+                                finish();
+                            }
+                        });
+                        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                        Button nbutton = alert.getButton(DialogInterface.BUTTON_NEGATIVE);
+                        nbutton.setTextColor(Color.GREEN);
+                        Button pbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
+                        pbutton.setTextColor(Color.RED);
                     }
                 });
 
@@ -500,6 +529,7 @@ public class EditNoteActivity extends AppCompatActivity {
 
     private void getListImages(int idNote) {
         listBitmap = new ArrayList<>();
+        listImage = new ArrayList<>();
 
         if (idNote != 0){
             Cursor cursor = myDB.readNoteImage(idNote);
@@ -518,6 +548,7 @@ public class EditNoteActivity extends AppCompatActivity {
                                             bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
                                         }
                                         listBitmap.add(bitmap);
+                                        listImage.add(new Image(Integer.parseInt(cursor.getString(0)), bitmap, Integer.parseInt(cursor.getString(2))));
                                     }
                                 });
 
@@ -569,8 +600,20 @@ public class EditNoteActivity extends AppCompatActivity {
             }
             myDB.updateData(idNote+"" ,mTitle.getText().toString(), mContent.getText().toString(), isCheckBoxOrContent, colorNote, imageBackground, 1);
 
+            if (listImage.size() > listBitmap.size()) {
+                for (int i = listImage.size()-listBitmap.size()-1; i >= 0 ; i--) {
+                    myDB.deleteOneRowImage(listImage.get(i).getId()+"");
+                }
+            }
+
+            int i = 0;
             for (Bitmap bitmap : listBitmap) {
-//                myDB.updateImage(bitmap, idNote+"");
+                if (listImage.size() > i){
+                    myDB.updateImage(listImage.get(i).getId()+"", bitmap);
+                } else {
+                    myDB.addImage(bitmap, idNote);
+                }
+                i++;
             }
         }
     }
