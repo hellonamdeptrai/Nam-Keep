@@ -26,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String NOTE_COLUMN_ID = "_id";
     private static final String NOTE_COLUMN_TITLE = "note_title";
     private static final String NOTE_COLUMN_CONTENT = "note_content";
+    private static final String NOTE_COLUMN_IS_CHECKBOX_OR_CONTENT = "note_is_check_box_or_content";
     private static final String NOTE_COLUMN_COLOR = "note_color";
     private static final String NOTE_COLUMN_BACKGROUND = "note_background";
     private static final String NOTE_COLUMN_CATEGORY_ID = "note_category_id";
@@ -49,6 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " (" + NOTE_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 NOTE_COLUMN_TITLE + " TEXT, " +
                 NOTE_COLUMN_CONTENT + " TEXT, " +
+                NOTE_COLUMN_IS_CHECKBOX_OR_CONTENT + " INTEGER, " +
                 NOTE_COLUMN_COLOR + " TEXT, " +
                 NOTE_COLUMN_BACKGROUND + " BLOB, " +
                 NOTE_COLUMN_CATEGORY_ID + " INTEGER);";
@@ -69,7 +71,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    void addNote(String title, String content, int color, Bitmap background, int categoryId){
+    public void addNote(String title, String content, int isCheckBoxOrContent, int color, Bitmap background, int categoryId){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -83,6 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cv.put(NOTE_COLUMN_TITLE, title);
         cv.put(NOTE_COLUMN_CONTENT, content);
+        cv.put(NOTE_COLUMN_IS_CHECKBOX_OR_CONTENT, isCheckBoxOrContent);
         cv.put(NOTE_COLUMN_COLOR, color);
         cv.put(NOTE_COLUMN_BACKGROUND, imageInByte);
         cv.put(NOTE_COLUMN_CATEGORY_ID, categoryId);
@@ -105,13 +108,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    void updateData(String row_id, String title, String content, String color, String background, int categoryId){
+    public void updateData(String row_id, String title, String content, int isCheckBoxOrContent, int color, Bitmap background, int categoryId){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
+
+        if(background != null) {
+            Bitmap bitmap = background;
+
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            imageInByte = byteArrayOutputStream.toByteArray();
+        }
+
         cv.put(NOTE_COLUMN_TITLE, title);
         cv.put(NOTE_COLUMN_CONTENT, content);
+        cv.put(NOTE_COLUMN_IS_CHECKBOX_OR_CONTENT, isCheckBoxOrContent);
         cv.put(NOTE_COLUMN_COLOR, color);
-        cv.put(NOTE_COLUMN_BACKGROUND, background);
+        cv.put(NOTE_COLUMN_BACKGROUND, imageInByte);
         cv.put(NOTE_COLUMN_CATEGORY_ID, categoryId);
 
         long result = db.update(TABLE_NOTE, cv, "_id=?", new String[]{row_id});
@@ -159,6 +172,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         }else {
             Toast.makeText(context, "Added Images Successfully!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void updateImage(String id, Bitmap image){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        if(image != null) {
+            Bitmap bitmap = image;
+
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            imageInByte = byteArrayOutputStream.toByteArray();
+        }
+
+        cv.put(IMAGE_COLUMN_BITMAP, imageInByte);
+
+        long result = db.update(TABLE_NOTE, cv, "_id=?", new String[]{id});
+        if(result == -1){
+            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(context, "Updated Images Successfully!", Toast.LENGTH_SHORT).show();
         }
     }
 

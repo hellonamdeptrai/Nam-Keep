@@ -6,16 +6,16 @@ public class Note {
     private int id;
     private String title;
     private String content;
+    private int isCheckBoxOrContent;
     private int color;
     private byte[] background;
     private int categoryId;
 
-    public Note() {}
-
-    public Note(int id, String title, String content, int color, byte[] background, int categoryId) {
+    public Note(int id, String title, String content, int isCheckBoxOrContent, int color, byte[] background, int categoryId) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.isCheckBoxOrContent = isCheckBoxOrContent;
         this.color = color;
         this.background = background;
         this.categoryId = categoryId;
@@ -43,6 +43,14 @@ public class Note {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public int getIsCheckBoxOrContent() {
+        return isCheckBoxOrContent;
+    }
+
+    public void setIsCheckBoxOrContent(int isCheckBoxOrContent) {
+        this.isCheckBoxOrContent = isCheckBoxOrContent;
     }
 
     public int getColor() {

@@ -35,6 +35,7 @@ import com.example.namkeep.Adapter.IClickChecked;
 import com.example.namkeep.Adapter.IClickDeleteCheckBox;
 import com.example.namkeep.Adapter.ITextWatcherCheckBox;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteAdapter;
+import com.example.namkeep.Adapter.RecyclerImagesAddNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
 import com.example.namkeep.object.CheckBoxContentNote;
 import com.example.namkeep.ui.gallery.PhotoAdapter;
@@ -69,6 +70,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private int colorNote = Color.rgb(255,255,255);
     private int isCheckBoxOrContent = 0;
+    private boolean isSaveData = true;
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -94,6 +96,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
         Button mSheetAddButton = findViewById(R.id.sheet_add_note_button);
         Button mSheetColorButton = findViewById(R.id.sheet_color_note_button);
+        Button mSheetThreeDotsNoteButton = findViewById(R.id.sheet_three_dots_note_button);
 
         mSheetAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,7 +141,27 @@ public class AddNoteActivity extends AppCompatActivity {
             }
         });
 
+        mSheetThreeDotsNoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(AddNoteActivity.this);
+                View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                        .inflate(
+                                R.layout.layout_bottom_sheet_three_dots_note,null
+                        );
 
+                bottomSheetView.findViewById(R.id.delete_add_note).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        isSaveData = false;
+                        finish();
+                    }
+                });
+
+                bottomSheetDialog.setContentView(bottomSheetView);
+                bottomSheetDialog.show();
+            }
+        });
     }
 
     private void changeTextToCheckbox() {
@@ -159,7 +182,7 @@ public class AddNoteActivity extends AppCompatActivity {
         addCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editTextIdCheckBox();
+                editTextDeleteIdCheckBox();
                 listCheckBox.add(new CheckBoxContentNote());
                 addListCheckBox(listCheckBox);
             }
@@ -168,7 +191,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private void endCheckBoxList(){
         String data = "";
-        editTextIdCheckBox();
+        editTextDeleteIdCheckBox();
         for (int i = 0; i < listCheckBox.size(); i++) {
             String row = "";
             row = row + listCheckBox.get(i).getContent() + "\n";
@@ -181,7 +204,7 @@ public class AddNoteActivity extends AppCompatActivity {
         isCheckBoxOrContent = 0;
     }
 
-    private void editTextIdCheckBox() {
+    private void editTextDeleteIdCheckBox() {
         for (int i = 0; i < listCheckBox.size(); i++) {
             if (listCheckBox.get(i).getContent().startsWith("!!$")) {
                 listCheckBox.get(i).setContent(listCheckBox.get(i).getContent().substring(3));
@@ -190,11 +213,27 @@ public class AddNoteActivity extends AppCompatActivity {
         }
     }
 
+    private void editTextAddIdCheckBox() {
+        editTextDeleteIdCheckBox();
+        for (int i = 0; i < listCheckBox.size(); i++) {
+            if (listCheckBox.get(i).isCheckBox()) {
+                listCheckBox.get(i).setContent("!!$"+listCheckBox.get(i).getContent());
+            }
+        }
+        String data = "";
+        for (int i = 0; i < listCheckBox.size(); i++) {
+            String row = "";
+            row = row + listCheckBox.get(i).getContent() + "\n";
+            data += row;
+        }
+        mContent.setText(data);
+    }
+
     private void addListCheckBox(List<CheckBoxContentNote> list) {
         RecyclerView mainCheckBoxNote = findViewById(R.id.main_checkbox_note);
 
         mainCheckBoxNote.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        RecyclerCheckBoxNoteAdapter adapter = new RecyclerCheckBoxNoteAdapter(this, list, new IClickDeleteCheckBox() {
+        RecyclerCheckBoxNoteAdapter adapter = new RecyclerCheckBoxNoteAdapter( list, new IClickDeleteCheckBox() {
             @Override
             public void onClickDeleteItem(int position) {
                 listCheckBox.remove(position);
@@ -365,11 +404,15 @@ public class AddNoteActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (isSaveData){
+            if (isCheckBoxOrContent == 1){
+                editTextAddIdCheckBox();
+            }
+            myDB.addNote(mTitle.getText().toString(), mContent.getText().toString(), isCheckBoxOrContent, colorNote, imageBackground, 1);
 
-        myDB.addNote(mTitle.getText().toString(), mContent.getText().toString(), colorNote, imageBackground, 1);
-
-        for (Bitmap bitmap : listBitmap) {
-            myDB.addImage(bitmap, myDB.getNoteIdNew());
+            for (Bitmap bitmap : listBitmap) {
+                myDB.addImage(bitmap, myDB.getNoteIdNew());
+            }
         }
     }
 
@@ -393,7 +436,13 @@ public class AddNoteActivity extends AppCompatActivity {
     private void addListImage() {
         RecyclerView mainImagesNote = findViewById(R.id.main_images_note);
         mainImagesNote.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
-        RecyclerImagesNoteAdapter adapter = new RecyclerImagesNoteAdapter(listBitmap);
+        RecyclerImagesAddNoteAdapter adapter = new RecyclerImagesAddNoteAdapter(this, listBitmap, new IClickDeleteCheckBox() {
+            @Override
+            public void onClickDeleteItem(int position) {
+                listBitmap.remove(position);
+                addListImage();
+            }
+        });
         mainImagesNote.setAdapter(adapter);
     }
 

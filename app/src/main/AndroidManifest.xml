@@ -12,9 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NamKeep">
         <activity
+            android:name=".DetailImageActivity"
+            android:exported="false"
+            android:parentActivityName=".AddNoteActivity"/>
+        <activity
             android:name=".AddNoteActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -29,7 +33,7 @@
         <activity
             android:name=".ui.home.EditNoteActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity" />
     </application>
 
 </manifest>

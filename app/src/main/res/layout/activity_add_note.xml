@@ -129,7 +129,7 @@
             android:id="@+id/sheet_add_note_button"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_baseline_check_box_24"
+            app:icon="@drawable/ic_baseline_add_box_24"
             app:iconTint="@color/black"
             android:paddingLeft="10dp"
             style="?android:attr/borderlessButtonStyle"/>
@@ -141,24 +141,24 @@
             app:iconTint="@color/black"
             android:padding="10dp"
             style="?android:attr/borderlessButtonStyle"/>
-        <Button
-            android:id="@+id/undo_note_button"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_baseline_undo_24"
-            app:iconTint="@color/black"
-            android:padding="10dp"
-            android:layout_gravity="center"
-            style="?android:attr/borderlessButtonStyle"/>
-        <Button
-            android:id="@+id/redo_note_button"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_baseline_redo_24"
-            app:iconTint="@color/black"
-            android:padding="10dp"
-            android:layout_gravity="center"
-            style="?android:attr/borderlessButtonStyle"/>
+<!--        <Button-->
+<!--            android:id="@+id/undo_note_button"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:icon="@drawable/ic_baseline_undo_24"-->
+<!--            app:iconTint="@color/black"-->
+<!--            android:padding="10dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            style="?android:attr/borderlessButtonStyle"/>-->
+<!--        <Button-->
+<!--            android:id="@+id/redo_note_button"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:icon="@drawable/ic_baseline_redo_24"-->
+<!--            app:iconTint="@color/black"-->
+<!--            android:padding="10dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            style="?android:attr/borderlessButtonStyle"/>-->
         <Button
             android:id="@+id/sheet_three_dots_note_button"
             android:layout_width="40dp"

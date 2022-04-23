@@ -6,6 +6,7 @@
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2315" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/background_radius.xml" value="0.281" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.2315" />
+        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/ic_baseline_add_box_24.xml" value="0.2315" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2315" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/ic_menu_camera.xml" value="0.2315" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/ic_menu_gallery.xml" value="0.2315" />
@@ -13,8 +14,9 @@
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/ic_search_black_24dp.xml" value="0.2315" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/menu_selector.xml" value="0.2315" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/drawable/side_nav_bar.xml" value="0.2315" />
-        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/activity_add_note.xml" value="0.26578073089701" />
-        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/activity_edit_note.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/activity_add_note.xml" value="0.25" />
+        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/activity_detail_image.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/activity_edit_note.xml" value="0.33" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/activity_main.xml" value="0.358695652173913" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/app_bar_main.xml" value="0.358695652173913" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/content_main.xml" value="0.358695652173913" />
@@ -23,6 +25,7 @@
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/fragment_home.xml" value="0.358695652173913" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/fragment_slideshow.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/grid_item.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/item_checkbox_home.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/item_checkbox_note.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/item_gallery.xml" value="0.1" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/item_home.xml" value="0.36666666666666664" />
@@ -30,6 +33,7 @@
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/layout_bottom_sheet_add_note.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/layout_bottom_sheet_color_note.xml" value="0.22" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/layout_bottom_sheet_three_dots_note.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/layout_dialog_image.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/mission_item_home.xml" value="0.2545289855072464" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/nav_header_main.xml" value="0.358695652173913" />
         <entry key="..\:/Users/tuann/AndroidStudioProjects/NamKeep/app/src/main/res/layout/reorder_activity.xml" value="0.358695652173913" />

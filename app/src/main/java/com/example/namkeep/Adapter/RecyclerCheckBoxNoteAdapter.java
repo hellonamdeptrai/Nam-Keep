@@ -31,19 +31,17 @@ import butterknife.Unbinder;
 public class RecyclerCheckBoxNoteAdapter extends RecyclerView.Adapter<RecyclerCheckBoxNoteAdapter.CheckBoxNoteViewHolder> implements ItemTouchHelperAdapter {
 
     private List<CheckBoxContentNote> list;
-    private Context context;
     private IClickDeleteCheckBox iClickDeleteCheckBox;
     private ITextWatcherCheckBox iTextWatcherCheckBox;
     private IClickChecked iClickChecked;
     OnStartDangListener listener;
 
-    public RecyclerCheckBoxNoteAdapter(Context context,List<CheckBoxContentNote> list,
+    public RecyclerCheckBoxNoteAdapter(List<CheckBoxContentNote> list,
                                        IClickDeleteCheckBox iClickDeleteCheckBox,
                                        ITextWatcherCheckBox iTextWatcherCheckBox,
                                        OnStartDangListener listener,
                                        IClickChecked iClickChecked) {
         this.list = list;
-        this.context = context;
         this.iClickDeleteCheckBox = iClickDeleteCheckBox;
         this.iTextWatcherCheckBox = iTextWatcherCheckBox;
         this.listener =listener;

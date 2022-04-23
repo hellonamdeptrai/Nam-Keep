@@ -69,16 +69,25 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 intent.putExtra(EditNoteActivity.EXTRA_PARAM_ID, note.getId());
                 intent.putExtra(EditNoteActivity.VIEW_NAME_TITLE, note.getTitle());
                 intent.putExtra(EditNoteActivity.VIEW_NAME_CONTENT, note.getContent());
+                intent.putExtra(EditNoteActivity.VIEW_NAME_IS_CHECKBOX, note.getIsCheckBoxOrContent());
                 intent.putExtra(EditNoteActivity.VIEW_NAME_BACKGROUND, note.getBackground());
                 intent.putExtra(EditNoteActivity.VIEW_NAME_EDIT_COLOR, note.getColor());
 
-                Pair isColorData;
+                Pair isColorData, isContentOrCheckbox;
                 if (note.getColor() != Color.rgb(255,255,255)) {
-                    isColorData = new Pair<>(view.findViewById(R.id.color_background_imaged_home),
+                    isColorData = new Pair<>(view.findViewById(R.id.color_background_image_home),
                             EditNoteActivity.VIEW_NAME_EDIT_COLOR);
                 } else {
-                    isColorData = new Pair<>(view.findViewById(R.id.content_note_home),
+                    isColorData = new Pair<>(view.findViewById(R.id.title_note_home),
                             EditNoteActivity.VIEW_NAME_EDIT_COLOR);
+                }
+
+                if (note.getIsCheckBoxOrContent() == 1) {
+                    isContentOrCheckbox = new Pair<>(view.findViewById(R.id.main_checkbox_note_home),
+                            EditNoteActivity.VIEW_NAME_LIST_CHECKBOX);
+                } else {
+                    isContentOrCheckbox = new Pair<>(view.findViewById(R.id.content_note_home),
+                            EditNoteActivity.VIEW_NAME_CONTENT);
                 }
 
                 @SuppressWarnings("unchecked")
@@ -88,8 +97,7 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 EditNoteActivity.VIEW_NAME_IMAGE),
                         new Pair<>(view.findViewById(R.id.title_note_home),
                                 EditNoteActivity.VIEW_NAME_TITLE),
-                        new Pair<>(view.findViewById(R.id.content_note_home),
-                                EditNoteActivity.VIEW_NAME_CONTENT),
+                        isContentOrCheckbox,
                         isColorData);
                 ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
             }
@@ -106,18 +114,15 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         Cursor cursor = myDB.readAllNote();
         if(cursor.getCount() != 0){
             while (cursor.moveToNext()){
-                byte[] blob = cursor.getBlob(4);
-//                Bitmap bitmap = null;
-//                if (blob != null) {
-//                    bitmap = BitmapFactory.decodeByteArray(blob,0,blob.length);
-//                }
+                byte[] blob = cursor.getBlob(5);
 
                 notes.add(new Note(Integer.parseInt(cursor.getString(0))
                         ,cursor.getString(1)
                         ,cursor.getString(2)
                         ,Integer.parseInt(cursor.getString(3))
+                        ,Integer.parseInt(cursor.getString(4))
                         ,blob
-                        ,Integer.parseInt(cursor.getString(5))
+                        ,Integer.parseInt(cursor.getString(6))
                 ));
             }
         }
