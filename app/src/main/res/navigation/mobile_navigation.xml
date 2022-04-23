@@ -13,13 +13,13 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.example.namkeep.ui.gallery.GalleryFragment"
+        android:name="com.example.namkeep.ui.label.LabelFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_label" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.example.namkeep.ui.slideshow.SlideshowFragment"
+        android:name="com.example.namkeep.ui.setting.SettingFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_setting" />
 </navigation>

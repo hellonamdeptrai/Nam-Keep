@@ -21,10 +21,12 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteHomeAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
+import com.example.namkeep.Adapter.RecyclerLabelNoteAdapter;
 import com.example.namkeep.DatabaseHelper;
 import com.example.namkeep.MainActivity;
 import com.example.namkeep.R;
 import com.example.namkeep.object.CheckBoxContentNote;
+import com.example.namkeep.object.Label;
 import com.example.namkeep.object.Note;
 import com.example.namkeep.ui.home.Helper.IClickItemDetail;
 import com.example.namkeep.ui.home.Helper.ItemTouchHelperAdapter;
@@ -116,6 +118,9 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
             holder.mainCheckboxNoteHome.setAdapter(adapterCheckbox);
         }
 
+        holder.mainCategoriesNoteHome.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL));
+        RecyclerLabelNoteAdapter adapter1 = new RecyclerLabelNoteAdapter(getListLabel(noteItem.getId()));
+        holder.mainCategoriesNoteHome.setAdapter(adapter1);
     }
 
     @Override
@@ -137,6 +142,20 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     public void inItemDismiss(int position) {
 //        stringList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    private List<Label> getListLabel(int idNote) {
+        List<Label> listLabelNote = new ArrayList<>();
+        Cursor cursor = myDB.readNoteLabel(idNote);
+        if(cursor.getCount() != 0){
+            while (cursor.moveToNext()){
+                listLabelNote.add(new Label(Integer.parseInt(cursor.getString(0))
+                        ,cursor.getString(1)
+                        ,Integer.parseInt(cursor.getString(2) != null ? cursor.getString(2) : "0")
+                ));
+            }
+        }
+        return listLabelNote;
     }
 
     private List<CheckBoxContentNote> getListCheckBox(String data) {
@@ -194,7 +213,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView title, content;
         LinearLayout linearLayout;
-        RecyclerView mainImagesNoteHome, mainCheckboxNoteHome;
+        RecyclerView mainImagesNoteHome, mainCheckboxNoteHome, mainCategoriesNoteHome;
         RoundedImageView colorBackgroundImagedHome, imageBackgroundHome;
 
         Unbinder unbinder;
@@ -209,6 +228,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.My
             colorBackgroundImagedHome = itemView.findViewById(R.id.color_background_image_home);
             imageBackgroundHome = itemView.findViewById(R.id.image_background_home);
             mainCheckboxNoteHome = itemView.findViewById(R.id.main_checkbox_note_home);
+            mainCategoriesNoteHome = itemView.findViewById(R.id.main_categories_note_home);
         }
     }
 }

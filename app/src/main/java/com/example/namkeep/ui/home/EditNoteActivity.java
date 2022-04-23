@@ -16,6 +16,7 @@
 
 package com.example.namkeep.ui.home;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -30,8 +31,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.transition.Transition;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -51,20 +55,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.namkeep.Adapter.IClickAddLabel;
 import com.example.namkeep.Adapter.IClickChecked;
 import com.example.namkeep.Adapter.IClickDeleteCheckBox;
 import com.example.namkeep.Adapter.ITextWatcherCheckBox;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteHomeAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesAddNoteAdapter;
-import com.example.namkeep.Adapter.RecyclerImagesEditNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
+import com.example.namkeep.Adapter.RecyclerLabelDialogAdapter;
+import com.example.namkeep.Adapter.RecyclerLabelNoteAdapter;
 import com.example.namkeep.AddNoteActivity;
 import com.example.namkeep.DatabaseHelper;
 import com.example.namkeep.MainActivity;
 import com.example.namkeep.R;
 import com.example.namkeep.object.CheckBoxContentNote;
 import com.example.namkeep.object.Image;
+import com.example.namkeep.object.Label;
 import com.example.namkeep.ui.home.Helper.MyItemTouchHelperCallback;
 import com.example.namkeep.ui.home.Helper.OnStartDangListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -94,8 +101,9 @@ public class EditNoteActivity extends AppCompatActivity {
     public static final String VIEW_NAME_IS_CHECKBOX = "edit:is_checkbox";
     public static final String VIEW_NAME_BACKGROUND = "edit:background";
     public static final String VIEW_NAME_EDIT_COLOR = "edit:color";
+    public static final String VIEW_NAME_LABEL = "edit:label";
 
-    private RecyclerView mImageView, mMainCheckboxNote;
+    private RecyclerView mImageView, mMainCheckboxNote, mMainLabel;
     private TextView mTitle, mContent;
     private RoundedImageView mEditColor;
     private CoordinatorLayout mMainContainerEditNote;
@@ -114,6 +122,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private ArrayList<Image> listImage;
 
     List<CheckBoxContentNote> listCheckBox = new ArrayList<>();
+    List<Label> listLabelNote = new ArrayList<>();
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imagePath;
@@ -140,6 +149,7 @@ public class EditNoteActivity extends AppCompatActivity {
         mMainCheckboxNote = findViewById(R.id.edit_main_checkbox_note);
         mEditColor = findViewById(R.id.edit_color_background_imaged);
         mMainContainerEditNote = findViewById(R.id.main_container_edit_note);
+        mMainLabel = findViewById(R.id.edit_main_categories_note);
 
         findViewById(R.id.bottom_app_bar_edit_note).setBackground(null);
 
@@ -149,6 +159,7 @@ public class EditNoteActivity extends AppCompatActivity {
         ViewCompat.setTransitionName(mMainCheckboxNote, VIEW_NAME_LIST_CHECKBOX);
         ViewCompat.setTransitionName(mMainContainerEditNote, VIEW_NAME_BACKGROUND);
         ViewCompat.setTransitionName(mEditColor, VIEW_NAME_EDIT_COLOR);
+        ViewCompat.setTransitionName(mMainLabel, VIEW_NAME_LABEL);
 
         Button mSheetAddButton = findViewById(R.id.edit_sheet_add_note_button);
         Button mSheetColorButton = findViewById(R.id.edit_sheet_color_note_button);
@@ -220,6 +231,9 @@ public class EditNoteActivity extends AppCompatActivity {
                                 for (Image image: listImage) {
                                     myDB.deleteOneRowImage(image.getId()+"");
                                 }
+                                for (Label label : listLabelNote) {
+                                    myDB.updateLabelIdNote(label.getId()+"", 0);
+                                }
                                 finish();
                             }
                         });
@@ -235,6 +249,60 @@ public class EditNoteActivity extends AppCompatActivity {
                         nbutton.setTextColor(Color.GREEN);
                         Button pbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE);
                         pbutton.setTextColor(Color.RED);
+                    }
+                });
+
+                bottomSheetView.findViewById(R.id.add_category_note).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final Dialog dialog = new Dialog(EditNoteActivity.this);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.layout_dialog_categories);
+
+                        Window window = dialog.getWindow();
+                        if (window == null) {
+                            return;
+                        }
+
+                        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+                        windowAttributes.gravity = Gravity.CENTER;
+                        window.setAttributes(windowAttributes);
+                        dialog.setCancelable(true);
+
+                        RecyclerView recyclerViewLabel = dialog.findViewById(R.id.main_label_dialog);
+                        List<Label> list = new ArrayList<>();
+                        Cursor cursor = myDB.readAllLabel();
+                        if(cursor.getCount() != 0){
+                            while (cursor.moveToNext()){
+                                list.add(new Label(Integer.parseInt(cursor.getString(0))
+                                        ,cursor.getString(1)
+                                        ,Integer.parseInt(cursor.getString(2) != null ? cursor.getString(2) : "0")
+                                ));
+                            }
+                        }
+                        recyclerViewLabel.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                        RecyclerLabelDialogAdapter adapter = new RecyclerLabelDialogAdapter(list, new IClickAddLabel() {
+                            @Override
+                            public void ClickAddLabel(int idLabel, String contentLabel) {
+                                boolean isAddLabel = true;
+                                for (int i = 0; i < listLabelNote.size(); i++) {
+                                    if (listLabelNote.get(i).getId() == idLabel){
+                                        listLabelNote.remove(i);
+                                        isAddLabel = false;
+                                    }
+                                }
+                                if (isAddLabel) {
+                                    listLabelNote.add(new Label(idLabel, contentLabel, 0));
+                                }
+                                RecyclerView recyclerViewLabelNote = findViewById(R.id.edit_main_categories_note);
+                                recyclerViewLabelNote.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL));
+                                RecyclerLabelNoteAdapter adapter1 = new RecyclerLabelNoteAdapter(listLabelNote);
+                                recyclerViewLabelNote.setAdapter(adapter1);
+                            }
+                        });
+                        recyclerViewLabel.setAdapter(adapter);
+
+                        dialog.show();
                     }
                 });
 
@@ -260,6 +328,7 @@ public class EditNoteActivity extends AppCompatActivity {
             //Setting Intent Data
             getListImages(idNote);
             addListImage();
+            getListLabel();
 
             mTitle.setText(titleNote);
             mContent.setText(contentNote);
@@ -284,6 +353,22 @@ public class EditNoteActivity extends AppCompatActivity {
         }else{
             Toast.makeText(this, "No data.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void getListLabel() {
+        Cursor cursor = myDB.readNoteLabel(idNote);
+        if(cursor.getCount() != 0){
+            while (cursor.moveToNext()){
+                listLabelNote.add(new Label(Integer.parseInt(cursor.getString(0))
+                        ,cursor.getString(1)
+                        ,Integer.parseInt(cursor.getString(2) != null ? cursor.getString(2) : "0")
+                ));
+            }
+        }
+        RecyclerView recyclerViewLabelNote = findViewById(R.id.edit_main_categories_note);
+        recyclerViewLabelNote.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL));
+        RecyclerLabelNoteAdapter adapter1 = new RecyclerLabelNoteAdapter(listLabelNote);
+        recyclerViewLabelNote.setAdapter(adapter1);
     }
 
     private void changeTextToCheckbox() {
@@ -599,6 +684,10 @@ public class EditNoteActivity extends AppCompatActivity {
                 editTextAddIdCheckBox();
             }
             myDB.updateData(idNote+"" ,mTitle.getText().toString(), mContent.getText().toString(), isCheckBoxOrContent, colorNote, imageBackground, 1);
+
+            for (Label label: listLabelNote) {
+                myDB.updateLabelIdNote(label.getId()+"", myDB.getNoteIdNew());
+            }
 
             if (listImage.size() > listBitmap.size()) {
                 for (int i = listImage.size()-listBitmap.size()-1; i >= 0 ; i--) {

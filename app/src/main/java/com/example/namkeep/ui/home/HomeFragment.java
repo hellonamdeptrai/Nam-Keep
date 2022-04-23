@@ -98,7 +98,9 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         new Pair<>(view.findViewById(R.id.title_note_home),
                                 EditNoteActivity.VIEW_NAME_TITLE),
                         isContentOrCheckbox,
-                        isColorData);
+                        isColorData,
+                        new Pair<>(view.findViewById(R.id.main_categories_note_home),
+                                EditNoteActivity.VIEW_NAME_LABEL));
                 ActivityCompat.startActivity(getActivity(), intent, activityOptions.toBundle());
             }
         });

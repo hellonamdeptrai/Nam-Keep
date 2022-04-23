@@ -3,7 +3,6 @@ package com.example.namkeep;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -11,44 +10,43 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.content.ActivityNotFoundException;
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.namkeep.Adapter.IClickAddLabel;
 import com.example.namkeep.Adapter.IClickChecked;
 import com.example.namkeep.Adapter.IClickDeleteCheckBox;
 import com.example.namkeep.Adapter.ITextWatcherCheckBox;
 import com.example.namkeep.Adapter.RecyclerCheckBoxNoteAdapter;
 import com.example.namkeep.Adapter.RecyclerImagesAddNoteAdapter;
-import com.example.namkeep.Adapter.RecyclerImagesNoteAdapter;
+import com.example.namkeep.Adapter.RecyclerLabelDialogAdapter;
+import com.example.namkeep.Adapter.RecyclerLabelNoteAdapter;
 import com.example.namkeep.object.CheckBoxContentNote;
-import com.example.namkeep.ui.gallery.PhotoAdapter;
+import com.example.namkeep.object.Label;
 import com.example.namkeep.ui.home.Helper.MyItemTouchHelperCallback;
 import com.example.namkeep.ui.home.Helper.OnStartDangListener;
+import com.example.namkeep.ui.label.Adapter.ILabelClick;
+import com.example.namkeep.ui.label.Adapter.LabelAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +65,7 @@ public class AddNoteActivity extends AppCompatActivity {
     DatabaseHelper myDB;
     List<Bitmap> listBitmap = new ArrayList<>();
     List<CheckBoxContentNote> listCheckBox = new ArrayList<>();
+    List<Label> listLabelNote = new ArrayList<>();
 
     private int colorNote = Color.rgb(255,255,255);
     private int isCheckBoxOrContent = 0;
@@ -74,6 +73,8 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
+    public static boolean isOpenCheckBox = false;
+    public static boolean isOpenAddImage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +110,7 @@ public class AddNoteActivity extends AppCompatActivity {
                 bottomSheetView.findViewById(R.id.add_image_note).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                        openImageContentProvider();
                     }
                 });
                 bottomSheetView.findViewById(R.id.add_checkbox_note).setOnClickListener(new View.OnClickListener() {
@@ -158,10 +156,81 @@ public class AddNoteActivity extends AppCompatActivity {
                     }
                 });
 
+                bottomSheetView.findViewById(R.id.add_category_note).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final Dialog dialog = new Dialog(AddNoteActivity.this);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.layout_dialog_categories);
+
+                        Window window = dialog.getWindow();
+                        if (window == null) {
+                            return;
+                        }
+
+                        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+                        windowAttributes.gravity = Gravity.CENTER;
+                        window.setAttributes(windowAttributes);
+                        dialog.setCancelable(true);
+
+                        RecyclerView recyclerViewLabel = dialog.findViewById(R.id.main_label_dialog);
+                        List<Label> list = new ArrayList<>();
+                        Cursor cursor = myDB.readAllLabel();
+                        if(cursor.getCount() != 0){
+                            while (cursor.moveToNext()){
+                                list.add(new Label(Integer.parseInt(cursor.getString(0))
+                                        ,cursor.getString(1)
+                                        ,Integer.parseInt(cursor.getString(2) != null ? cursor.getString(2) : "0")
+                                ));
+                            }
+                        }
+                        recyclerViewLabel.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+                        RecyclerLabelDialogAdapter adapter = new RecyclerLabelDialogAdapter(list, new IClickAddLabel() {
+                            @Override
+                            public void ClickAddLabel(int idLabel, String contentLabel) {
+                                boolean isAddLabel = true;
+                                for (int i = 0; i < listLabelNote.size(); i++) {
+                                    if (listLabelNote.get(i).getId() == idLabel){
+                                        listLabelNote.remove(i);
+                                        isAddLabel = false;
+                                    }
+                                }
+                                if (isAddLabel) {
+                                    listLabelNote.add(new Label(idLabel, contentLabel, 0));
+                                }
+                                RecyclerView recyclerViewLabelNote = findViewById(R.id.main_categories_note);
+                                recyclerViewLabelNote.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.HORIZONTAL));
+                                RecyclerLabelNoteAdapter adapter1 = new RecyclerLabelNoteAdapter(listLabelNote);
+                                recyclerViewLabelNote.setAdapter(adapter1);
+                            }
+                        });
+                        recyclerViewLabel.setAdapter(adapter);
+
+                        dialog.show();
+                    }
+                });
+
                 bottomSheetDialog.setContentView(bottomSheetView);
                 bottomSheetDialog.show();
             }
         });
+
+        if (isOpenCheckBox){
+            changeTextToCheckbox();
+            isOpenCheckBox = false;
+        }
+
+        if (isOpenAddImage){
+            openImageContentProvider();
+            isOpenAddImage = false;
+        }
+    }
+
+    private void openImageContentProvider() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     private void changeTextToCheckbox() {
@@ -410,9 +479,14 @@ public class AddNoteActivity extends AppCompatActivity {
             }
             myDB.addNote(mTitle.getText().toString(), mContent.getText().toString(), isCheckBoxOrContent, colorNote, imageBackground, 1);
 
+            int idNewNote = myDB.getNoteIdNew();
             for (Bitmap bitmap : listBitmap) {
-                myDB.addImage(bitmap, myDB.getNoteIdNew());
+                myDB.addImage(bitmap, idNewNote);
             }
+            for (Label label: listLabelNote) {
+                myDB.updateLabelIdNote(label.getId()+"", idNewNote);
+            }
+
         }
     }
 

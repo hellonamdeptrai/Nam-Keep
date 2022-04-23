@@ -36,6 +36,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String IMAGE_COLUMN_BITMAP = "image_bitmap";
     private static final String IMAGE_COLUMN_NOTE_ID = "image_note_id";
 
+    private static final String TABLE_LABEL = "my_label";
+    private static final String LABEL_COLUMN_ID = "_id";
+    private static final String LABEL_COLUMN_CONTENT = "label_content";
+    private static final String LABEL_COLUMN_NOTE_ID = "label_note_id";
+
     private ByteArrayOutputStream byteArrayOutputStream;
     private byte[] imageInByte;
 
@@ -61,6 +66,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 IMAGE_COLUMN_BITMAP + " BLOB, " +
                 IMAGE_COLUMN_NOTE_ID + " INTEGER);";
         sqLiteDatabase.execSQL(queryImage);
+
+        String queryLabel = "CREATE TABLE " + TABLE_LABEL +
+                " (" + LABEL_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                LABEL_COLUMN_CONTENT + " TEXT, " +
+                LABEL_COLUMN_NOTE_ID + " INTEGER);";
+        sqLiteDatabase.execSQL(queryLabel);
     }
 
     @Override
@@ -68,6 +79,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTE);
         onCreate(sqLiteDatabase);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGE);
+        onCreate(sqLiteDatabase);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_LABEL);
         onCreate(sqLiteDatabase);
     }
 
@@ -91,14 +104,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(NOTE_COLUMN_CATEGORY_ID, categoryId);
         long result = db.insert(TABLE_NOTE,null, cv);
         if(result == -1){
-            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(context, "Added Successfully!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Added Successfully!", Toast.LENGTH_SHORT).show();
         }
     }
 
     public Cursor readAllNote(){
-        String query = "SELECT * FROM " + TABLE_NOTE;
+        String query = "SELECT * FROM " + TABLE_NOTE+ " ORDER BY _id DESC";
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
@@ -129,9 +142,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.update(TABLE_NOTE, cv, "_id=?", new String[]{row_id});
         if(result == -1){
-            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(context, "Updated Successfully!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Updated Successfully!", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -140,15 +153,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete(TABLE_NOTE, "_id=?", new String[]{row_id});
         if(result == -1){
-            Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(context, "Successfully Deleted.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Successfully Deleted.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    void deleteAllData(){
+    public void deleteAllData(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NOTE);
+        db.execSQL("DELETE FROM " + TABLE_IMAGE);
+        db.execSQL("DELETE FROM " + TABLE_LABEL);
     }
 
 //    -----------------
@@ -169,9 +184,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(IMAGE_COLUMN_NOTE_ID, noteId);
         long result = db.insert(TABLE_IMAGE,null, cv);
         if(result == -1){
-            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(context, "Added Images Successfully!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Added Images Successfully!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -191,9 +206,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.update(TABLE_IMAGE, cv, "_id=?", new String[]{id});
         if(result == -1){
-            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(context, "Updated Images Successfully!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Updated Images Successfully!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -201,9 +216,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete(TABLE_IMAGE, "_id=?", new String[]{row_id});
         if(result == -1){
-            Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(context, "Successfully Image Deleted.", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Successfully Image Deleted.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -232,5 +247,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
+    }
+
+    //    -----------------
+
+    public Cursor readAllLabel(){
+        String query = "SELECT * FROM " + TABLE_LABEL+ " ORDER BY _id DESC";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    public Cursor readNoteLabel(int idNote){
+        String query = "SELECT * FROM " + TABLE_LABEL + " WHERE label_note_id = " + idNote;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    public void addLabel(String content){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(LABEL_COLUMN_CONTENT, content);
+        long result = db.insert(TABLE_LABEL,null, cv);
+        if(result == -1){
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+        }else {
+//            Toast.makeText(context, "Added Labeled Successfully!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void updateLabel(String id, String content){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(LABEL_COLUMN_CONTENT, content);
+
+        long result = db.update(TABLE_LABEL, cv, "_id=?", new String[]{id});
+        if(result == -1){
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+        }else {
+//            Toast.makeText(context, "Updated Labeled Successfully!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void updateLabelIdNote(String id, int noteId){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(LABEL_COLUMN_NOTE_ID, noteId);
+
+        long result = db.update(TABLE_LABEL, cv, "_id=?", new String[]{id});
+        if(result == -1){
+//            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+        }else {
+//            Toast.makeText(context, "Updated Labeled Successfully!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteOneRowLabel(String row_id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.delete(TABLE_LABEL, "_id=?", new String[]{row_id});
+        if(result == -1){
+//            Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
+        }else{
+//            Toast.makeText(context, "Successfully Labeled Deleted.", Toast.LENGTH_SHORT).show();
+        }
     }
 }

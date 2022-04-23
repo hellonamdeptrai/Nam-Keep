@@ -2,12 +2,17 @@ package com.example.namkeep;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -35,6 +40,25 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
                 startActivity(intent);
+            }
+        });
+        binding.appBarMain.bottomAppBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.home_add_check_box:
+                        Intent intentCheckbox = new Intent(MainActivity.this, AddNoteActivity.class);
+                        AddNoteActivity.isOpenCheckBox = true;
+                        startActivity(intentCheckbox);
+                        return true;
+                    case R.id.home_add_image:
+                        Intent intentImage = new Intent(MainActivity.this, AddNoteActivity.class);
+                        AddNoteActivity.isOpenAddImage = true;
+                        startActivity(intentImage);
+                        return true;
+                    default:
+                        return true;
+                }
             }
         });
         DrawerLayout drawer = binding.drawerLayout;
